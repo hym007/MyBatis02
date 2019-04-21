@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hym.mapper.Mapper">
+
+    <!--一对多-->
+    <!--方式一：嵌套结果-->
+    <select id="findUserById" parameterType="int" resultMap="UserWithOrdersResult">
+          select u.*,o.id as orders_id,o.number
+          from tb_user u,tb_orders o
+          where u.id=o.user_id
+          and u.id=#{idu}
+    </select>
+
+    <resultMap id="UserWithOrdersResult" type="User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="address" column="address"/>
+        <collection property="orders" ofType="Orders">
+            <id property="id" column="orders_id"/>
+            <result property="number" column="number"/>
+        </collection>
+    </resultMap>
+
+
+    <!--方式二：嵌套查询-->
+    <select id="findUserById2" parameterType="int" resultMap="UserWithOrdersResult2">
+            select * from tb_user where id=#{idu2}
+    </select>
+    <resultMap id="UserWithOrdersResult2" type="User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="address" column="address"/>
+        <collection property="orders" column="id"
+        ofType="Orders"
+        select="com.hym.mapper.Mapper.findUserById2"/>
+    </resultMap>
+</mapper>
